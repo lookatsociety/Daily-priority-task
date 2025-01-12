@@ -22,13 +22,14 @@
             transition: background-color 0.3s;
         }
         .widget {
-            background-color: #333;
+            background-color: #333; /* Color por defecto */
             color: white;
             border-radius: 20px;
             padding: 20px;
             width: 350px;
             position: relative;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s; /* Para suavizar el cambio de color */
         }
         .circle-top-left {
             width: 60px;
@@ -81,6 +82,12 @@
             border: 2px solid white;
             border-radius: 50%;
             margin-right: 10px; /* Espaciado entre el círculo y el texto */
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .circle.completed {
+            background-color: grey;
+            border-color: whitesmoke;
         }
         .task {
             font-size: 1rem;
@@ -127,6 +134,7 @@
 
     function applyTheme() {
         document.body.style.backgroundColor = theme === 'dark' ? 'var(--bg-color-dark)' : 'var(--bg-color-light)';
+        widget.style.backgroundColor = theme === 'dark' ? '#3333' : '#333'; // Color del contenedor cambia según el tema
         localStorage.setItem('theme', theme);
     }
 
@@ -146,6 +154,18 @@
         }
         task.addEventListener('input', () => {
             localStorage.setItem(`task-${index}`, task.value);
+        });
+    });
+
+    const circles = document.querySelectorAll('.circle');
+    circles.forEach((circle, index) => {
+        const isCompleted = localStorage.getItem(`task-completed-${index}`) === 'true';
+        if (isCompleted) {
+            circle.classList.add('completed');
+        }
+        circle.addEventListener('click', () => {
+            const completed = circle.classList.toggle('completed');
+            localStorage.setItem(`task-completed-${index}`, completed);
         });
     });
 </script>
