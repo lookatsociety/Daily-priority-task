@@ -147,6 +147,7 @@
     const widget = document.getElementById('widget');
     const profileCircle = document.getElementById('profileCircle');
     const imageInput = document.getElementById('imageInput');
+    const taskNumber = document.querySelector('.task-number');
     let theme = localStorage.getItem('theme') || 'light';
 
     function applyTheme() {
@@ -166,6 +167,12 @@
     // Manejar tareas
     const tasks = document.querySelectorAll('.task');
     const circles = document.querySelectorAll('.circle');
+
+    function updateTaskCount() {
+        const totalTasks = tasks.length;
+        const completedTasks = document.querySelectorAll('.circle.completed').length;
+        taskNumber.textContent = totalTasks - completedTasks;
+    }
 
     tasks.forEach((task, index) => {
         const storedTask = localStorage.getItem(`task-${index}`);
@@ -189,8 +196,12 @@
             const completed = circle.classList.toggle('completed');
             tasks[index].classList.toggle('completed', completed);
             localStorage.setItem(`task-completed-${index}`, completed);
+            updateTaskCount();
         });
     });
+
+    // Inicializar el contador
+    updateTaskCount();
 
     // Manejar la imagen de perfil con compresión
     const savedImage = localStorage.getItem('profileImage');
