@@ -22,14 +22,14 @@
             transition: background-color 0.3s;
         }
         .widget {
-            background-color: #333; /* Color por defecto */
+            background-color: #333;
             color: white;
             border-radius: 20px;
             padding: 20px;
             width: 350px;
             position: relative;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s; /* Para suavizar el cambio de color */
+            transition: background-color 0.3s;
         }
         .circle-top-left {
             width: 60px;
@@ -39,6 +39,16 @@
             position: absolute;
             top: 15px;
             left: 15px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .circle-top-left img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .theme-toggle {
             position: absolute;
@@ -72,7 +82,7 @@
         .task-item {
             display: flex;
             align-items: center;
-            justify-content: flex-end; /* Alinea todo el contenido hacia la derecha */
+            justify-content: flex-end;
             margin: 10px 0;
             width: 100%;
         }
@@ -81,7 +91,7 @@
             height: 20px;
             border: 2px solid white;
             border-radius: 50%;
-            margin-right: 10px; /* Espaciado entre el círculo y el texto */
+            margin-right: 10px;
             cursor: pointer;
             transition: background-color 0.3s, border-color 0.3s;
         }
@@ -95,15 +105,20 @@
             background: transparent;
             color: inherit;
             outline: none;
-            text-align: right; /* Texto alineado a la derecha */
+            text-align: right;
             flex: 1;
+            transition: opacity 0.3s;
+        }
+        .task.completed {
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
 
 <div class="widget" id="widget">
-    <div class="circle-top-left"></div>
+    <div class="circle-top-left" id="profileCircle"></div>
+    <input type="file" id="imageInput" accept="image/*" style="display: none;">
     <div class="theme-toggle" id="themeToggle"></div>
     <p class="task-number">4</p>
     <p class="task-label">Daily priority task</p>
@@ -130,11 +145,13 @@
 <script>
     const themeToggle = document.getElementById('themeToggle');
     const widget = document.getElementById('widget');
+    const profileCircle = document.getElementById('profileCircle');
+    const imageInput = document.getElementById('imageInput');
     let theme = localStorage.getItem('theme') || 'light';
 
     function applyTheme() {
         document.body.style.backgroundColor = theme === 'dark' ? 'var(--bg-color-dark)' : 'var(--bg-color-light)';
-        widget.style.backgroundColor = theme === 'dark' ? '#3333' : '#333'; // Color del contenedor cambia según el tema
+        widget.style.backgroundColor = theme === 'dark' ? '#3333' : '#333';
         localStorage.setItem('theme', theme);
     }
 
@@ -146,27 +163,56 @@
     themeToggle.addEventListener('click', toggleTheme);
     applyTheme();
 
+    // Manejar tareas
     const tasks = document.querySelectorAll('.task');
+    const circles = document.querySelectorAll('.circle');
+
     tasks.forEach((task, index) => {
         const storedTask = localStorage.getItem(`task-${index}`);
+        const isCompleted = localStorage.getItem(`task-completed-${index}`) === 'true';
+
         if (storedTask) {
             task.value = storedTask;
         }
+        if (isCompleted) {
+            task.classList.add('completed');
+            circles[index].classList.add('completed');
+        }
+
         task.addEventListener('input', () => {
             localStorage.setItem(`task-${index}`, task.value);
         });
     });
 
-    const circles = document.querySelectorAll('.circle');
     circles.forEach((circle, index) => {
-        const isCompleted = localStorage.getItem(`task-completed-${index}`) === 'true';
-        if (isCompleted) {
-            circle.classList.add('completed');
-        }
         circle.addEventListener('click', () => {
             const completed = circle.classList.toggle('completed');
+            tasks[index].classList.toggle('completed', completed);
             localStorage.setItem(`task-completed-${index}`, completed);
         });
+    });
+
+    // Manejar la imagen de perfil
+    const savedImage = localStorage.getItem('profileImage');
+    if (savedImage) {
+        profileCircle.innerHTML = `<img src="${savedImage}" alt="Profile Picture">`;
+    }
+
+    profileCircle.addEventListener('click', () => {
+        imageInput.click();
+    });
+
+    imageInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageData = e.target.result;
+                profileCircle.innerHTML = `<img src="${imageData}" alt="Profile Picture">`;
+                localStorage.setItem('profileImage', imageData);
+            };
+            reader.readAsDataURL(file);
+        }
     });
 </script>
 
