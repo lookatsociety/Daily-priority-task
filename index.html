@@ -57,12 +57,39 @@
         .theme-toggle {
             position: absolute;
             top: 15px;
-            right: 15px;
+            right: 45px;
             width: 24px;
             height: 24px;
             background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDEuOWMtNS42IDAtMTAuMSA0LjUtMTAuMSAxMCAwIDUuNiA0LjUgMTAgMTAuMSAxMCA1LjYgMCAxMC4xLTQuNSAxMC4xLTEwIDAtNS42LTQuNS0xMC0xMC4xLTEweiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==');
             background-size: cover;
             cursor: pointer;
+        }
+        .clear-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 20px;
+            height: 20px;
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .clear-button:hover {
+            opacity: 1;
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .clear-button::before {
+            content: '×';
+            font-weight: bold;
         }
         .task-number {
             font-size: 2rem;
@@ -113,8 +140,13 @@
             flex: 1;
             transition: opacity 0.3s;
         }
+        .task::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+            opacity: 1;
+        }
         .task.completed {
             opacity: 0.5;
+            text-decoration: line-through;
         }
     </style>
 </head>
@@ -124,23 +156,24 @@
     <div class="circle-top-left" id="profileCircle"></div>
     <input type="file" id="imageInput" accept="image/*" style="display: none;">
     <div class="theme-toggle" id="themeToggle"></div>
+    <div class="clear-button" id="clearButton" title="Limpiar todas las tareas"></div>
     <p class="task-number">4</p>
     <p class="task-label">Daily priority task</p>
     <div class="task-container" id="taskList">
         <div class="task-item">
-            <input type="text" class="task" value="Daily priority task">
+            <input type="text" class="task" placeholder="Daily priority task">
             <div class="circle"></div>
         </div>
         <div class="task-item">
-            <input type="text" class="task" value="Daily priority task">
+            <input type="text" class="task" placeholder="Daily priority task">
             <div class="circle"></div>
         </div>
         <div class="task-item">
-            <input type="text" class="task" value="Daily priority task">
+            <input type="text" class="task" placeholder="Daily priority task">
             <div class="circle"></div>
         </div>
         <div class="task-item">
-            <input type="text" class="task" value="Daily priority task">
+            <input type="text" class="task" placeholder="Daily priority task">
             <div class="circle"></div>
         </div>
     </div>
@@ -206,6 +239,21 @@
 
     // Inicializar el contador
     updateTaskCount();
+
+    // Botón limpiar tareas
+    const clearButton = document.getElementById('clearButton');
+    clearButton.addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que quieres limpiar todas las tareas?')) {
+            tasks.forEach((task, index) => {
+                task.value = '';
+                task.classList.remove('completed');
+                circles[index].classList.remove('completed');
+                localStorage.removeItem(`task-${index}`);
+                localStorage.removeItem(`task-completed-${index}`);
+            });
+            updateTaskCount();
+        }
+    });
 
     // Manejar la imagen de perfil con compresión
     const savedImage = localStorage.getItem('profileImage');
