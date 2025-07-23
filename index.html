@@ -254,31 +254,24 @@
     
     function clearAllTasks() {
         try {
-            // Usar una confirmación más simple que funcione en iframes
-            const shouldClear = window.confirm ? 
-                window.confirm('¿Estás seguro de que quieres limpiar todas las tareas?') : 
-                true; // Si no hay confirm disponible, proceder directamente
+            const allTasks = document.querySelectorAll('.task');
+            const allCircles = document.querySelectorAll('.circle');
             
-            if (shouldClear) {
-                const allTasks = document.querySelectorAll('.task');
-                const allCircles = document.querySelectorAll('.circle');
-                
-                allTasks.forEach((task, index) => {
-                    task.value = '';
-                    task.classList.remove('completed');
-                    if (allCircles[index]) {
-                        allCircles[index].classList.remove('completed');
-                    }
-                    try {
-                        localStorage.removeItem(`task-${index}`);
-                        localStorage.removeItem(`task-completed-${index}`);
-                    } catch (e) {
-                        // Ignorar errores de localStorage en entornos restringidos
-                        console.log('No se pudo acceder a localStorage');
-                    }
-                });
-                updateTaskCount();
-            }
+            allTasks.forEach((task, index) => {
+                task.value = '';
+                task.classList.remove('completed');
+                if (allCircles[index]) {
+                    allCircles[index].classList.remove('completed');
+                }
+                try {
+                    localStorage.removeItem(`task-${index}`);
+                    localStorage.removeItem(`task-completed-${index}`);
+                } catch (e) {
+                    // Ignorar errores de localStorage en entornos restringidos
+                    console.log('No se pudo acceder a localStorage');
+                }
+            });
+            updateTaskCount();
         } catch (error) {
             console.log('Error al limpiar tareas:', error);
         }
